@@ -9,7 +9,7 @@ from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
 from homeassistant.core import callback
 
 from .const import (
-    DOMAIN, CONF_CHANNEL, CONF_DEVICE_ID, CONF_TIMEOUT, CONF_POLL_INTERVAL,
+    DOMAIN, CONF_CHANNEL, CONF_DEVICE_ID, CONF_TIMEOUT, CONF_POLL_INTERVAL, CONF_POLL_STATUS, DEFAULT_POLL_STATUS,
     DEFAULT_NAME, DEFAULT_HOST, DEFAULT_PORT, DEFAULT_TIMEOUT, DEFAULT_POLL_INTERVAL,
 )
 
@@ -28,6 +28,7 @@ def form_schema(values: dict | None = None) -> vol.Schema:
             vol.All(vol.Coerce(int), vol.Range(min=1, max=16)),
         vol.Required(CONF_TIMEOUT, default=values.get(CONF_TIMEOUT, DEFAULT_TIMEOUT)):
             vol.All(vol.Coerce(float), vol.Range(min=0.5, max=30)),
+        vol.Required(CONF_POLL_STATUS, default=values.get(CONF_POLL_STATUS, DEFAULT_POLL_STATUS)): bool,
         vol.Required(CONF_POLL_INTERVAL, default=values.get(CONF_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)):
             vol.All(vol.Coerce(int), vol.Range(min=5, max=3600)),
     })

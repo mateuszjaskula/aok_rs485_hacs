@@ -1,7 +1,7 @@
 """A-OK RS-485 protocol v05. No Home Assistant dependencies.
 
 Commands: 9A ID CHANNEL_LOW CHANNEL_HIGH COMMAND DATA XOR
-Responses: D8 ID CHANNEL_LOW CHANNEL_HIGH CURRENT VOLTAGE RPM POSITION FLAGS XOR
+Responses from AM68-EC-P: D8 ID CHANNEL_LOW CHANNEL_HIGH CURRENT VOLTAGE RPM POSITION FLAGS XOR FF
 """
 
 from dataclasses import dataclass
@@ -15,7 +15,7 @@ COMMAND_STOP = 0xCC
 COMMAND_DOWN = 0xEE
 COMMAND_ACTION = 0x0A
 COMMAND_QUERY = 0xCC
-RESPONSE_LENGTH = 10
+RESPONSE_LENGTH = 11
 
 
 def checksum(payload: bytes) -> int:
@@ -96,9 +96,11 @@ def parse_status(raw: bytes, expected_id: int, expected_channel: int) -> MotorSt
         raise ValueError(f"Invalid response length: {len(raw)}")
     if raw[0] != HEADER_RESPONSE:
         raise ValueError("Incorrect response header")
-    if checksum(raw[1:-1]) != raw[-1]:
+    if raw[-1] != 0xFF:
+        raise ValueError("Incorrect response terminator (expected FF)")
+    if checksum(raw[1:-2]) != raw[-2]:
         raise ValueError("Incorrect response XOR checksum")
-    device_id, lo, hi, current, voltage, rpm, position, flags = raw[1:-1]
+    device_id, lo, hi, current, voltage, rpm, position, flags = raw[1:-2]
     if device_id != expected_id:
         raise ValueError(f"Response from unexpected device ID {device_id}")
     bit_low, bit_high = channel_mask(expected_channel)

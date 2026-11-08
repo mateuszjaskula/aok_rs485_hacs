@@ -1,7 +1,7 @@
 {
   "domain": "aok_rs485",
   "name": "A-OK RS485 Curtain",
-  "version": "1.1.0",
+  "version": "1.3.1",
   "documentation": "https://github.com/REPLACE_WITH_YOUR_ACCOUNT/aok-rs485-homeassistant",
   "issue_tracker": "https://github.com/REPLACE_WITH_YOUR_ACCOUNT/aok-rs485-homeassistant/issues",
   "codeowners": [],
