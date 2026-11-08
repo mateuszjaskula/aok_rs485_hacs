@@ -1,0 +1,12 @@
+{
+  "domain": "aok_rs485",
+  "name": "A-OK RS485 Curtain",
+  "version": "1.1.0",
+  "documentation": "https://github.com/REPLACE_WITH_YOUR_ACCOUNT/aok-rs485-homeassistant",
+  "issue_tracker": "https://github.com/REPLACE_WITH_YOUR_ACCOUNT/aok-rs485-homeassistant/issues",
+  "codeowners": [],
+  "config_flow": true,
+  "requirements": [],
+  "dependencies": [],
+  "iot_class": "local_polling"
+}

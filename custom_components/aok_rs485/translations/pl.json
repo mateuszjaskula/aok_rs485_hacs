@@ -1,0 +1,44 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "A-OK RS485 — dodaj zasłonę",
+        "description": "USR-DR164 musi działać jako TCP Server z przezroczystym RS485 (2400 8N1). Testuje dostępność TCP, a nie odpowiedź silnika.",
+        "data": {
+          "name": "Nazwa zasłony",
+          "host": "Adres IP lub nazwa USR-DR164",
+          "port": "Port TCP",
+          "device_id": "ID silnika (1–99)",
+          "channel": "Kanał RS485 (1–16)",
+          "timeout": "Limit czasu (sekundy)",
+          "poll_interval": "Odczyt stanu co (sekundy)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nie można połączyć się z bramką TCP. Sprawdź adres IP, port i tryb TCP Server.",
+      "invalid_host": "Podaj adres IP lub nazwę hosta."
+    },
+    "abort": {"already_configured": "Ten silnik i kanał są już skonfigurowane."}
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Konfiguracja zasłony A-OK",
+        "data": {
+          "name": "Nazwa zasłony",
+          "host": "Adres IP lub nazwa USR-DR164",
+          "port": "Port TCP",
+          "device_id": "ID silnika (1–99)",
+          "channel": "Kanał RS485 (1–16)",
+          "timeout": "Limit czasu (sekundy)",
+          "poll_interval": "Odczyt stanu co (sekundy)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nie można połączyć się z bramką TCP.",
+      "invalid_host": "Podaj adres IP lub nazwę hosta."
+    }
+  }
+}
