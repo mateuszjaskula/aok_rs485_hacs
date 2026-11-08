@@ -4,11 +4,21 @@ Niestandardowa integracja Home Assistant (`cover`) dla silników zasłon A-OK ko
 
 **Status:** parser odpowiedzi statusu zweryfikowany z logiem VCOM rzeczywistego AM68-2/80-EC-P; komunikacja z Home Assistant nadal wymaga testu na urządzeniu. Nie jest oficjalną integracją A-OK ani HACS. Zanim użyjesz jej na rzeczywistej zasłonie, sprawdź ustawienia ID/kanału i krańcówki.
 
+## Wersja 1.3.3 — poprawa stanu krańcowego i przycisków
+
+W tej instalacji wartość pozycji raportowana przez silnik rośnie w kierunku fizycznego OTWARCIA, a nie zamknięcia. Poprzednie wydanie błędnie odwracało ją (`100 - motor_position`), przez co Home Assistant wyszarzał przycisk **Otwórz**, gdy zasłona była fizycznie zamknięta.
+
+- Odczyt `D8`: `HA_position = motor_position` — 0 = zamknięta, 100 = otwarta.
+- Suwak `set_cover_position` używa analogicznej skali. Zmieniono mapowanie zadanej pozycji tak, aby odpowiadała nowemu wskazaniu.
+- Komendy fizycznego **Otwórz/Zamknij/Stop** pozostają bez zmian względem v1.3.2.
+- Po aktualizacji należy przetestować pozycje 0, 50 i 100; interpretacja krańców wynika z obserwacji użytkownika, nie z nowego przechwycenia ramek procentowych.
+- Instalacja: zastąp `custom_components/aok_rs485`, uruchom ponownie HA, odczyt statusu pozostaw włączony.
+
 ## Wersja 1.3.2 — korekta kierunków
 
 - **Otwórz** w Home Assistant wysyła `9A 01 01 00 0A EE E4` (fizyczne otwieranie w tej instalacji).
 - **Zamknij** wysyła `9A 01 01 00 0A DD D7` (fizyczne zamykanie w tej instalacji).
-- **STOP i odczyt pozycji pozostają bez zmian**. Pozycja z ramki odpowiedzi nie jest dodatkowo odwracana względem v1.3.1.
+- **STOP pozostaje bez zmian**. Uwaga: odczyt pozycji skorygowano w wersji 1.3.3.
 - Funkcja ustawiania pozycji procentowej wymaga osobnego testu na napędzie; w tej aktualizacji jej ramki nie zmieniano.
 - Aktualizacja: zastąp folder `custom_components/aok_rs485` i uruchom ponownie Home Assistant.
 
@@ -58,7 +68,7 @@ Niestandardowa integracja Home Assistant (`cover`) dla silników zasłon A-OK ko
 | Zamknij w Home Assistant | `9A 01 01 00 0A DD D7` |
 | Odczytaj status | `9A 01 01 00 CC 00 CC` |
 
-Pozycje: protokół silnika **0 = otwarte, 100 = zamknięte**; Home Assistant **100 = otwarte, 0 = zamknięte**. Integracja odwraca pozycję.
+Pozycje w tej instalacji (na podstawie zachowania przycisków przy krańcach): **silnik 0 = zamknięte, 100 = otwarte**; Home Assistant **100 = otwarte, 0 = zamknięte**. Integracja v1.3.3 nie odwraca pozycji.
 
 ## Ograniczenia i bezpieczeństwo
 
@@ -105,7 +115,7 @@ Usuń stary wpis `cover: - platform: aok_rs485` z `configuration.yaml`, zastąp 
 ## Wersja 1.3.1: odczyt rzeczywistej pozycji
 
 - W **Ustawienia → Urządzenia i usługi → A-OK RS485 → Konfiguruj** włącz `Odczyt statusu` / `Poll status` i ustaw interwał 5–10 sekund. **Uwaga:** aktualizacja nie nadpisuje wartości zapisanej we wcześniejszej konfiguracji (wersja 1.2.0 domyślnie wyłączała odczyt).
-- Realne ramki z VCOM `D8 01 01 00 XX 18 XX PP XX XOR FF` mają 11 bajtów; `PP` jest pozycją silnika 0–100%. Home Assistant pokazuje `100 - PP`.
+- Realne ramki z VCOM `D8 01 01 00 XX 18 XX PP XX XOR FF` mają 11 bajtów; `PP` jest pozycją silnika 0–100%. Home Assistant v1.3.3 pokazuje `PP` (wcześniejsze wydania odwracały ją błędnie w tej instalacji).
 - Po komendzie ruchu integracja nie nadpisuje prawdziwej pozycji celem; odczytuje stan ponownie i kontynuuje cykliczne odpytywanie.
 - Opcjonalnie włącz `logger: {logs: {custom_components.aok_rs485: debug}}`, aby w logu zobaczyć `A-OK TX`, `A-OK RX` oraz `A-OK position: motor=... HA=...`.
 - Na czas korzystania z Home Assistant zamknij A-OK i **rozłącz USR-VCOM**, ponieważ równoczesne połączenia wcześniej kolidowały.

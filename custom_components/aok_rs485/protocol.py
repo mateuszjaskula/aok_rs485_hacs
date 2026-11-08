@@ -52,10 +52,10 @@ def stop_frame(device_id: int, channel: int) -> bytes:
 
 
 def position_frame(device_id: int, channel: int, ha_position: int) -> bytes:
-    """HA: 100=open / 0=closed; motor: 0=open / 100=closed."""
+    """HA: 100=open / 0=closed; this installation reports the same direction."""
     if not 0 <= ha_position <= 100:
         raise ValueError("ha_position must be between 0 and 100")
-    return frame(device_id, channel, COMMAND_UP, 100 - ha_position)
+    return frame(device_id, channel, COMMAND_UP, ha_position)
 
 
 def query_frame(device_id: int, channel: int) -> bytes:
@@ -76,7 +76,7 @@ class MotorStatus:
 
     @property
     def ha_position(self) -> int:
-        return 100 - self.motor_position
+        return self.motor_position
 
     @property
     def moving(self) -> bool:

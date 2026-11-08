@@ -13,8 +13,8 @@ class TestAokProtocol(unittest.TestCase):
         self.assertEqual(stop_frame(9, 8).hex(' '), '9a 09 80 00 0a cc 4f')
     def test_close_document_example(self):
         self.assertEqual(close_frame(9, 8).hex(' '), '9a 09 80 00 0a ee 6d')
-    def test_percentage_reverse(self):
-        expected = bytes((0x9a, 9, 0x80, 0, 0xdd, 75))
+    def test_percentage_matches_ha(self):
+        expected = bytes((0x9a, 9, 0x80, 0, 0xdd, 25))
         self.assertEqual(position_frame(9, 8, 25), expected + bytes((checksum(expected[1:]),)))
     def test_query(self):
         self.assertEqual(query_frame(9, 8).hex(' '), '9a 09 80 00 cc 00 45')
@@ -24,7 +24,7 @@ class TestAokProtocol(unittest.TestCase):
         data = bytes((9, 0x80, 0, 3, 24, 50, 75, 0x03))
         raw = b'\xd8' + data + bytes((checksum(data), 0xFF))
         status = parse_status(raw, 9, 8)
-        self.assertEqual(status.ha_position, 25)
+        self.assertEqual(status.ha_position, 75)
         self.assertTrue(status.moving)
         self.assertTrue(status.limits_set)
     def test_bad_checksum(self):
@@ -34,13 +34,14 @@ class TestAokProtocol(unittest.TestCase):
         raw = bytes.fromhex('D8 01 01 00 05 18 00 64 02 7B FF')
         status = parse_status(raw, 1, 1)
         self.assertEqual(status.motor_position, 100)
-        self.assertEqual(status.ha_position, 0)
+        self.assertEqual(status.ha_position, 100)
         self.assertFalse(status.moving)
 
     def test_real_motor_response_while_moving(self):
         raw = bytes.fromhex('D8 01 01 00 03 18 1F 01 03 06 FF')
         status = parse_status(raw, 1, 1)
         self.assertEqual(status.motor_position, 1)
+        self.assertEqual(status.ha_position, 1)
         self.assertTrue(status.moving)
 
     def test_real_motor_response_with_position(self):
