@@ -4,6 +4,14 @@ Niestandardowa integracja Home Assistant (`cover`) dla silników zasłon A-OK ko
 
 **Status:** parser odpowiedzi statusu zweryfikowany z logiem VCOM rzeczywistego AM68-2/80-EC-P; komunikacja z Home Assistant nadal wymaga testu na urządzeniu. Nie jest oficjalną integracją A-OK ani HACS. Zanim użyjesz jej na rzeczywistej zasłonie, sprawdź ustawienia ID/kanału i krańcówki.
 
+## Wersja 1.3.2 — korekta kierunków
+
+- **Otwórz** w Home Assistant wysyła `9A 01 01 00 0A EE E4` (fizyczne otwieranie w tej instalacji).
+- **Zamknij** wysyła `9A 01 01 00 0A DD D7` (fizyczne zamykanie w tej instalacji).
+- **STOP i odczyt pozycji pozostają bez zmian**. Pozycja z ramki odpowiedzi nie jest dodatkowo odwracana względem v1.3.1.
+- Funkcja ustawiania pozycji procentowej wymaga osobnego testu na napędzie; w tej aktualizacji jej ramki nie zmieniano.
+- Aktualizacja: zastąp folder `custom_components/aok_rs485` i uruchom ponownie Home Assistant.
+
 ## Ważne dla instalacji 192.168.1.30 / ID=1 / kanał=1
 
 - Ustawienia domyślne: `192.168.1.30:8899`, ID `1`, kanał `1`.
@@ -45,9 +53,9 @@ Niestandardowa integracja Home Assistant (`cover`) dla silników zasłon A-OK ko
 
 | Akcja | HEX |
 |---|---|
-| Otwórz | `9A 01 01 00 0A DD D7` |
+| Otwórz w Home Assistant | `9A 01 01 00 0A EE E4` |
 | Stop | `9A 01 01 00 0A CC C6` |
-| Zamknij | `9A 01 01 00 0A EE E4` |
+| Zamknij w Home Assistant | `9A 01 01 00 0A DD D7` |
 | Odczytaj status | `9A 01 01 00 CC 00 CC` |
 
 Pozycje: protokół silnika **0 = otwarte, 100 = zamknięte**; Home Assistant **100 = otwarte, 0 = zamknięte**. Integracja odwraca pozycję.

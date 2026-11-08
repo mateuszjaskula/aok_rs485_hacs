@@ -125,18 +125,18 @@ class AokCover(CoverEntity):
             self._attr_is_closing = False
             if not self._poll_status:
                 # Only estimate endpoints when real status polling is disabled.
-                if payload == open_frame(self._device_id, self._channel):
-                    self._attr_current_cover_position = 100
-                    self._attr_is_closed = False
-                elif payload == close_frame(self._device_id, self._channel):
-                    self._attr_current_cover_position = 0
-                    self._attr_is_closed = True
+                if requested_position is not None:
+                    self._attr_current_cover_position = requested_position
+                    self._attr_is_closed = requested_position == 0
                 elif payload == stop_frame(self._device_id, self._channel):
                     self._attr_current_cover_position = None
                     self._attr_is_closed = None
-                elif requested_position is not None:
-                    self._attr_current_cover_position = requested_position
-                    self._attr_is_closed = requested_position == 0
+                elif direction == "opening":
+                    self._attr_current_cover_position = 100
+                    self._attr_is_closed = False
+                elif direction == "closing":
+                    self._attr_current_cover_position = 0
+                    self._attr_is_closed = True
             self.async_write_ha_state()
         if self._poll_status:
             # Re-read after a command instead of immediately reporting its target
@@ -182,10 +182,12 @@ class AokCover(CoverEntity):
         return {"rs485_device_id": self._device_id, "rs485_channel": self._channel, "status_polling_enabled": self._poll_status, "position_is_estimated": self._attr_assumed_state}
 
     async def async_open_cover(self, **kwargs) -> None:
-        await self._send(open_frame(self._device_id, self._channel), "opening")
+        # Verified on this installation: the motor's DOWN opcode opens the curtain.
+        await self._send(close_frame(self._device_id, self._channel), "opening")
 
     async def async_close_cover(self, **kwargs) -> None:
-        await self._send(close_frame(self._device_id, self._channel), "closing")
+        # Verified on this installation: the motor's UP opcode closes the curtain.
+        await self._send(open_frame(self._device_id, self._channel), "closing")
 
     async def async_stop_cover(self, **kwargs) -> None:
         await self._send(stop_frame(self._device_id, self._channel), None)
